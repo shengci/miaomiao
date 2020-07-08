@@ -1,5 +1,7 @@
 <template>
   <div class="cinema_body">
+    <Loading v-if="isLoading"/>
+	  <Scroller v-else :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd">
     <ul>
       <!-- <li>
 						<div>
@@ -15,7 +17,7 @@
                 			<div>折扣卡</div>
        					</div>
       </li>-->
-
+	<li class="pullDown">{{pullDownMsg}}</li>
       <li v-for="item in cinemaList" :key="item.cinemaId">
         <div>
           <span>{{item.name}}</span>
@@ -32,6 +34,7 @@
         </div>
       </li>
     </ul>
+	  </Scroller>
   </div>
 </template>
 
@@ -40,12 +43,18 @@ export default {
 	name:'CiList',
 	data(){
 		return{
-			cinemaList:[]
+      cinemaList:[],
+      pullDownMsg: "",
+      isLoading:true,
+      prevCityId:-1
 		};
 	},
-	mounted(){
+	activated(){
+    var cityId=this.$store.state.city.id;
+		if(this.prevCityId==cityId){return;}
+		this.isLoading=true;
 		return this.axios({
-			url:'https://m.maizuo.com/gateway?cityId=110100&ticketFlag=1&k=4239372',
+			url:'https://m.maizuo.com/gateway?cityId='+cityId+'&ticketFlag=1&k=4239372',
 			headers:{
 				'X-Client-Info': '{"a":"3000","ch":"1002","v":"5.0.4","e":"1593655949562627830874114","bc":"110100"}',
 				'X-Host': 'mall.film-ticket.cinema.list'
@@ -53,7 +62,9 @@ export default {
 		}).then((res)=>{
 			var msg=res.data.msg;
 			if(msg=='ok'){
-				this.cinemaList=res.data.data.cinemas;
+        this.isLoading=false;	
+        this.cinemaList=res.data.data.cinemas;
+        this.prevCityId=cityId;
 			}
 		});
 	},
@@ -82,7 +93,37 @@ export default {
 			}
 			return '';	
 		}
-	}
+	},
+	methods: {
+    handleToDetail() {
+      console.log("执行了");
+    },
+    handleToScroll(pos) {
+      if (pos.y > 30) {
+        this.pullDownMsg = "正在更新中";
+      }
+    },
+    handleToTouchEnd(pos) {
+      if (pos.y > 30) {
+        return this.axios({
+			url:'https://m.maizuo.com/gateway?cityId=110100&ticketFlag=1&k=4239372',
+			headers:{
+				'X-Client-Info': '{"a":"3000","ch":"1002","v":"5.0.4","e":"1593655949562627830874114","bc":"110100"}',
+				'X-Host': 'mall.film-ticket.cinema.list'
+			}
+		}).then(res => {
+            var msg=res.data.msg;	//axios获取的数据修改成自己的
+            if (msg=='ok') {		//axios获取的数据修改成自己的
+              this.pullDownMsg = "更新成功";
+              setTimeout(() => {
+                this.cinemaList=res.data.data.cinemas;	//axios获取的数据修改成自己的
+                this.pullDownMsg = "";
+              }, 1000);
+            }
+         });
+      }
+    }
+  }
 }
 </script>
 

@@ -56,11 +56,14 @@ export default {
   },
   watch: {
     message(newVal) {
+      var cityId=this.$store.state.city.id;
+      // console.log(cityId);
+      // var cityId=1;
       var that = this;
       this.cancelRequest();
 
       this.axios
-        .get("/ajax/search?cityId=1&kw=" + newVal, {
+        .get('/ajax/search?cityId='+cityId+'&kw=' + newVal, {
           cancelToken: new this.axios.CancelToken(function(c) {
             that.source = c;
           })
