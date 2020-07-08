@@ -1,5 +1,7 @@
 <template>
     <div class="movie_body">
+		<Loading v-if="isLoading"/>
+	<Scroller v-else :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd">
 				<ul>
 					<!-- <li>
 						<div class="pic_show"><img src="/images/movie_1.jpg"></div>
@@ -14,6 +16,7 @@
 						</div>
 					</li> -->
 
+					<li class="pullDown">{{pullDownMsg}}</li>
 					<li v-for="item in coming" :key="item.id">
 						<div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
 						<div class="info_list">
@@ -27,7 +30,8 @@
 						</div>
 					</li> 
 				</ul>
-			</div>
+	</Scroller>
+	</div>
 </template>
 
 <script>
@@ -35,17 +39,50 @@ export default {
 	name:'comingSoon',
 	data(){
 		return{
-			coming:[]
-		}
+			coming:[],
+			pullDownMsg: "",
+			isLoading:true,
+			prevCityId:-1
+		};
 	},
-	mounted(){
-		this.axios.get('/ajax/comingList?ci=10&token=&limit=10&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code=10').then((res)=>{
+	activated(){
+		var optimus_code=this.$store.state.city.id;
+		if(this.prevCityId==optimus_code){return;}
+		this.isLoading=true;
+		console.log(123);
+		this.axios.get('/ajax/comingList?ci=10&token=&limit=10&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code='+optimus_code).then((res)=>{
 			var coming=res.data.coming;
 			if(!coming==0){
 				this.coming=res.data.coming;
+				this.isLoading=false;
+				this.prevCityId=optimus_code;
 			}
 		});
-	}
+	},
+	methods: {
+    handleToDetail() {
+      console.log("执行了");
+    },
+    handleToScroll(pos) {
+      if (pos.y > 30) {
+        this.pullDownMsg = "正在更新中";
+      }
+    },
+    handleToTouchEnd(pos) {
+      if (pos.y > 30) {
+        this.axios.get('/ajax/comingList?ci=10&token=&limit=10&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code=10').then(res => {
+            var coming=res.data.coming;
+            if (!coming==0) {
+              this.pullDownMsg = "更新成功";
+              setTimeout(() => {
+                this.coming = res.data.coming;
+                this.pullDownMsg = "";
+              }, 1000);
+            }
+         });
+      }
+    }
+  }
 }
 </script>
 
