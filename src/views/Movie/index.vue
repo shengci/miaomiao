@@ -19,6 +19,7 @@
             </keep-alive>
         </div>
         <TagBar />
+        <router-view name="detail" />
     </div>
 </template>
 

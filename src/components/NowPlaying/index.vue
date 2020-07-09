@@ -18,11 +18,11 @@
 
         <li class="pullDown">{{pullDownMsg}}</li>
         <li v-for="item in coming" :key="item.id">
-          <div class="pic_show" @tap="handleToDetail">
+          <div class="pic_show" @tap="handleToDetail(item.id)">
             <img :src="item.img | setWH('128.180')" />
           </div>
           <div class="info_list">
-            <h2>
+            <h2 @tap="handleToDetail(item.id)">
               {{item.nm}}
               <img src="@/assets/maxs.png" alt />
             </h2>
@@ -100,8 +100,9 @@ export default {
       });
   },
   methods: {
-    handleToDetail() {
-      console.log("执行了");
+    handleToDetail(movieId) {
+      // console.log(movieId);
+      this.$router.push('/movie/detail/1/'+movieId);
     },
     handleToScroll(pos) {
       if (pos.y > 30) {
