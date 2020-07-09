@@ -8,6 +8,10 @@ module.exports = {
             '/geoip/':{
                 target:'https://api.asilu.com',
                 changeOrigin:true
+            },
+            '/v2/':{
+                target:'https://api.douban.com',
+                changeOrigin:true
             }
         }
     }
