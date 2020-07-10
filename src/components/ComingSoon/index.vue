@@ -17,13 +17,13 @@
 					</li> -->
 
 					<li class="pullDown">{{pullDownMsg}}</li>
-					<li v-for="item in coming" :key="item.id">
-						<div class="pic_show" @tap="handleToDetail(item.id)"><img :src="item.img | setWH('128.180')"></div>
+					<li v-for="item in subjects" :key="item.id">
+						<div class="pic_show" @tap="handleToDetail(item.id)"><img :src="item.cover"></div>
 						<div class="info_list">
-							<h2 @tap="handleToDetail(item.id)">{{item.nm}}<img v-if="item.version" src="@/assets/maxs.png" alt=""></h2>
-							<p><span class="person">{{item.wish}}</span> 人想看</p>
-							<p>主演: {{item.star}}</p>
-							<p>{{item.rt}}上映</p>
+							<h2 @tap="handleToDetail(item.id)">{{item.title}}<img v-if="item.is_new" src="@/assets/maxs.png" alt=""></h2>
+							<p><span class="grade">{{item.cover_y}}</span> 万人想看</p>
+							<p>主演: 陈建斌,任素汐,潘斌龙</p>
+							<p >豆瓣评分：<span class="grade">{{item.rate}}</span></p>
 						</div>
 						<div class="btn_pre">
 							预售
@@ -39,23 +39,23 @@ export default {
 	name:'comingSoon',
 	data(){
 		return{
-			coming:[],
+			subjects:[],
 			pullDownMsg: "",
 			isLoading:true,
 			prevCityId:-1
 		};
 	},
 	activated(){
-		var optimus_code=this.$store.state.city.id;
-		if(this.prevCityId==optimus_code){return;}
+		var maizuoCityId=this.$store.state.city.id;
+		if(this.prevCityId==maizuoCityId){return;}
 		this.isLoading=true;
 		console.log(123);
-		this.axios.get('/ajax/comingList?ci=10&token=&limit=10&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code='+optimus_code).then((res)=>{
-			var coming=res.data.coming;
-			if(!coming==0){
-				this.coming=res.data.coming;
+		this.axios.get('/j/search_subjects?type=movie&tag=%E6%9C%80%E6%96%B0&page_limit=20&page_start=0&maizuoCityId='+maizuoCityId).then((res)=>{
+			var subjects=res.data.subjects;
+			if(!subjects==0){
+				this.subjects=res.data.subjects;
 				this.isLoading=false;
-				this.prevCityId=optimus_code;
+				this.prevCityId=maizuoCityId;
 			}
 		});
 	},
@@ -71,12 +71,12 @@ export default {
     },
     handleToTouchEnd(pos) {
       if (pos.y > 30) {
-        this.axios.get('/ajax/comingList?ci=10&token=&limit=10&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code=10').then(res => {
-            var coming=res.data.coming;
-            if (!coming==0) {
+        this.axios.get('/j/search_subjects?type=movie&tag=%E6%9C%80%E6%96%B0&page_limit=20&page_start=0subjects').then(res => {
+            var subjects=res.data.subjects;
+            if (!subjects==0) {
               this.pullDownMsg = "更新成功";
               setTimeout(() => {
-                this.coming = res.data.coming;
+                this.subjects = res.data.subjects;
                 this.pullDownMsg = "";
               }, 1000);
             }

@@ -3,8 +3,9 @@
     <Header title="影片详情">
         <i class="iconfont icon-right" @touchstart="handleToBack"></i>
     </Header>
-    <div id="content" class="contentDetail">
-      <div class="detail_list">
+    <Loading v-if="isLoading" />
+    <div v-else id="content" class="contentDetail">
+      <!-- <div class="detail_list">
         <div class="detail_list_bg"></div>
         <div class="detail_list_filter"></div>
         <div class="detail_list_content">
@@ -33,40 +34,42 @@
             <p>陈建斌</p>
             <p>马先勇</p>
           </li>
-          <li class="swiper-slide">
+        </ul>
+      </div> -->
+
+      <div class="detail_list">
+        <div class="detail_list_bg"></div>
+        <div class="detail_list_filter"></div>
+        <div class="detail_list_content">
+          <div class="detail_list_img">
+            <img :src="defailMovie.images.large" alt />
+          </div>
+          <div class="detail_list_info">
+            <h2>{{defailMovie.title}}</h2>
+            <p>{{defailMovie.original_title}}</p>
+            <p>{{defailMovie.rating.average}}</p>
+            <p>{{defailMovie.genres}}</p>
+            <p>{{defailMovie.countries}} / {{defailMovie.durations}}</p>
+            <p>{{defailMovie.mainland_pubdate}}上映</p>
+          </div>
+        </div>
+      </div>
+      <div class="detail_intro">
+        <p>{{defailMovie.summary}}</p>
+      </div>
+      <div class="detail_player swiper-container" ref="detail_player">
+        <ul class="swiper-wrapper">
+          <li v-for="(item,index) in defailMovie.directors" :key="index" class="swiper-slide">
             <div>
-              <img src="/images/person_1.webp" alt />
+              <img :src="item.avatars.large" alt />
             </div>
-            <p>陈建斌</p>
-            <p>马先勇</p>
+            <p>{{item.name}}</p>
           </li>
-          <li class="swiper-slide">
+          <li v-for="(item,index1) in defailMovie.casts" :key="'info2-'+index1" class="swiper-slide">
             <div>
-              <img src="/images/person_1.webp" alt />
+              <img :src="item.avatars.large" alt />
             </div>
-            <p>陈建斌</p>
-            <p>马先勇</p>
-          </li>
-          <li class="swiper-slide">
-            <div>
-              <img src="/images/person_1.webp" alt />
-            </div>
-            <p>陈建斌</p>
-            <p>马先勇</p>
-          </li>
-          <li class="swiper-slide">
-            <div>
-              <img src="/images/person_1.webp" alt />
-            </div>
-            <p>陈建斌</p>
-            <p>马先勇</p>
-          </li>
-          <li class="swiper-slide">
-            <div>
-              <img src="/images/person_1.webp" alt />
-            </div>
-            <p>陈建斌</p>
-            <p>马先勇</p>
+            <p>{{item.name}}</p>
           </li>
         </ul>
       </div>
@@ -78,6 +81,12 @@
 import Header from '@/components/Header';
 export default {
   name: "detail",
+  data(){
+    return{
+      defailMovie: {},
+      isLoading:true
+    }
+  },
   components:{
       Header
   },
@@ -89,10 +98,19 @@ export default {
   },
   mounted(){
     //   console.log(this.movieId);
-    this.axios.get('/v2/movie/subject/34964061?apikey=0df993c66c0c636e29ecbb5344252a4a').then((res)=>{
+    this.axios.get('/v2/movie/subject/'+this.movieId+'?apikey=0df993c66c0c636e29ecbb5344252a4a').then((res)=>{
         var msg=res.data;
         if(!msg==0){
-            console.log(msg);
+            // console.log(msg);
+            this.isLoading=false;
+            this.defailMovie=res.data;
+            this.$nextTick(()=>{
+                new Swiper(this.$refs.detail_player , {
+                slidesPerView : 'auto',
+                freeMode : true,
+                freeModeSticky: true
+              });
+            });
         }
     });
   }
@@ -115,5 +133,10 @@ export default {
 .detail_list .detail_list_img img{ width:100%; height: 100%;}
 .detail_list .detail_list_info{ margin-top: 20px;}
 .detail_list .detail_list_info h2{ font-size: 20px; color:white; font-weight: normal; line-height: 40px;}
-.detail_list .detail_list_info p{ color:white; line-height: 20px; font-size: 14px; color:#ccc;} 
+.detail_list .detail_list_info p{ color:white; line-height: 20px; font-size: 14px; color:#ccc;}
+#content .detail_intro{ padding: 10px;}
+#content .detail_player{ margin:20px;}
+.detail_player .swiper-slide{ width:70px; margin-right: 20px; text-align: center; font-size: 14px;}
+.detail_player .swiper-slide img{ width:100%; margin-bottom: 5px;}
+.detail_player .swiper-slide p:nth-of-type(2){ color:#999;} 
 </style>

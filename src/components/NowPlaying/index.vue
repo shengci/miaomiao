@@ -17,20 +17,20 @@
         </li>-->
 
         <li class="pullDown">{{pullDownMsg}}</li>
-        <li v-for="item in coming" :key="item.id">
+        <li v-for="item in subjects" :key="item.id">
           <div class="pic_show" @tap="handleToDetail(item.id)">
-            <img :src="item.img | setWH('128.180')" />
+            <img :src="item.cover" />
           </div>
           <div class="info_list">
             <h2 @tap="handleToDetail(item.id)">
-              {{item.nm}}
+              {{item.title}}
               <img src="@/assets/maxs.png" alt />
             </h2>
             <p>
-              <span class="grade">{{item.wish}}人想看</span>
+              <span class="grade">{{item.cover_y}}万人想看</span>
             </p>
             <p>主演: 陈建斌,任素汐,潘斌龙</p>
-            <p>时间：{{item.comingTitle}}</p>
+            <p>豆瓣评分：<span class="grade">{{item.rate}}</span></p>
           </div>
           <div class="btn_mall">购票</div>
         </li>
@@ -46,7 +46,7 @@ export default {
   name: "NowPlaying",
   data() {
     return {
-      coming: [],
+    subjects: [],
 	  pullDownMsg: "",
     isLoading:true,
     prevCityId:-1
@@ -54,20 +54,20 @@ export default {
   },
   activated() {
    
-    var optimus_code=this.$store.state.city.id;
-    if(this.prevCityId==optimus_code){return;}
+    var maizuoCityId=this.$store.state.city.id;
+    if(this.prevCityId==maizuoCityId){return;}
     this.isLoading=true;
     console.log(123);
     this.axios
       .get(
-        "/ajax/mostExpected?ci=10&limit=10&offset=0&token=&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code="+optimus_code
+        '/j/search_subjects?type=movie&tag=%E7%83%AD%E9%97%A8&page_limit=50&page_start=0&maizuoCityId='+maizuoCityId
       )
       .then(res => {
-        var msg = res.data.coming;
+        var msg = res.data.subjects;
         if (!msg == 0) {
-		  this.coming = res.data.coming;
+		  this.subjects = res.data.subjects;
       this.isLoading=false;
-      this.prevCityId=optimus_code;
+      this.prevCityId=maizuoCityId;
           //   this.$nextTick(() => {
           //     var scroll=new BScroll(this.$refs.movie_body, {
           // 		// tap:true,
@@ -113,14 +113,14 @@ export default {
       if (pos.y > 30) {
         this.axios
           .get(
-            "/ajax/mostExpected?ci=10&limit=10&offset=0&token=&optimus_uuid=92ACFAD0BC1011EAAD390FB34C2BDB36E5138F6941C3497E8ECDF99267C966FC&optimus_risk_level=71&optimus_code=10"
+            "/j/search_subjects?type=movie&tag=%E7%83%AD%E9%97%A8&page_limit=50&page_start=0"
           )
           .then(res => {
-            var msg = res.data.coming;
+            var msg = res.data.subjects;
             if (!msg == 0) {
               this.pullDownMsg = "更新成功";
               setTimeout(() => {
-                this.coming = res.data.coming;
+                this.subjects = res.data.subjects;
                 this.pullDownMsg = "";
               }, 1000);
             }

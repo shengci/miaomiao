@@ -9,8 +9,12 @@ module.exports = {
                 target:'https://api.asilu.com',
                 changeOrigin:true
             },
-            '/v2/':{
+            '/v2/movie/':{
                 target:'https://api.douban.com',
+                changeOrigin:true
+            },
+            '/j/search_subjects':{
+                target:'https://movie.douban.com',
                 changeOrigin:true
             }
         }
